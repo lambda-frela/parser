@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-import sys
 import requests
 from bs4 import BeautifulSoup
 
@@ -12,4 +11,3 @@ soup = BeautifulSoup(r.text,  "html.parser")
 top_titles = soup.find_all("a", class_="tag-book-title")
 
 with open('output.txt','w',encoding='utf8') as f:
-	
