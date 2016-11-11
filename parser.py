@@ -10,4 +10,7 @@ request.encoding = 'utf-8'
 soup = BeautifulSoup(request.text, "html.parser")
 top_titles = soup.find_all("a", class_="tag-book-title")
 
-with open('output.txt','w',encoding='utf8') as f:
+with open('output.txt', 'w', encoding='utf8') as f:
+    for item in top_titles:
+        f.write(item.contents[0] + '\n')
+
