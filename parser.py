@@ -11,3 +11,5 @@ soup = BeautifulSoup(request.text, "html.parser")
 top_titles = soup.find_all("a", class_="tag-book-title")
 
 with open('output.txt','w',encoding='utf8') as f:
+    for line in top_titles:
+        f.write(line + '\n')
