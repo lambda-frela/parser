@@ -3,12 +3,10 @@ import requests
 import sys
 from bs4 import BeautifulSoup
 
-
-if sys.argv[1]:
-    target_url = sys.argv[1][1:]
-else:
-    target_url = "http://www.livelib.ru/books/top"
-
+try:
+	target_url = sys.argv[1][1:]
+except IndexError:
+	target_url = "http://www.livelib.ru/books/top"
 request = requests.get(target_url)
 request.encoding = 'utf-8'
 
