@@ -2,7 +2,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-
 target_url = "http://www.livelib.ru/books/top"
 
 request = requests.get(target_url)
@@ -13,5 +12,4 @@ top_titles = soup.find_all("a", class_="tag-book-title")
 
 with open('output.txt','w',encoding='utf8') as f:
     for book in top_titles:
-        for elem in book:
-            f.write(elem+'\n')
+        f.write(book.text+'\n')
