@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
-import collections as cl
 import re
 
 import requests
+
 from bs4 import BeautifulSoup
-#Функционал легко расширить за счет кликов по полям с книгами
+# Функционал легко расширить за счет кликов по полям с книгами
+
 
 class Site():
     def __init__(self, url):
@@ -32,10 +33,11 @@ class Site():
         if self.cashed_data:
             return self.cashed_data
         else:
-            taged_authors, taged_titles = self.get_tags()
             head = 'Топ 100 книг по версии ' + self.name + ', проверяйте'
             books = [head]
+            taged_authors, taged_titles = self.get_tags()
             counter = range(len(taged_titles))
+
             for num, author, title in zip(counter, taged_authors, taged_titles):
                 try:
                     title = title.get_text().strip()
@@ -43,15 +45,17 @@ class Site():
                     string = '{0}. {1} \n "{2}"'.format(num + 1, author, title)
                     books.append(string)
                 except AttributeError:
-                    # Исключения поднимутся в случаях, когда в результате парсинга некоторые элементы будут не типа Tag
-                    # В этом случае предусмотрено поведение для типов str и list, которые появятся в списке тегов, если автора нет или их несколько
+                    # Исключения поднимутся в случаях, когда после парсинга некоторые элементы будут не типа "Tag"
+                    # В этом случае предусмотрено поведение для типов str и list,
+                    # которые появятся в списке тегов, если автора нет или их несколько
                     if isinstance(author, str):
                         string = '{0}. {1} "{2}"'.format(num + 1, '-ошибка парсинга-', title)
                     elif isinstance(author, list):
-                        authors = ', '.join(map(lambda x: x.get_text(), author)) # Сложна?
+                        authors = ', '.join(map(lambda x: x.get_text(), author))  # Сложна?
                         string = '{0}. {1} "{2}"'.format(num + 1, authors, title)
-                        books.append(string)
-            #в классы сайтов добавил аттрибут для кэша данных
+
+                    books.append(string)
+            # в классы сайтов добавил аттрибут для кэша данных
             self.cashed_data = books
 
             return books
@@ -65,6 +69,7 @@ class LiveLib(Site):
         self.authors_tag, self.authors_attrs = 'a', {'class': 'tag-book-author'}
         self.cashed_data = []
 
+
 class ReadRate(Site):
     def __init__(self, url):
         Site.__init__(self, url)
@@ -72,6 +77,7 @@ class ReadRate(Site):
         self.title_tag, self.title_attrs = 'div', {'class': "title"}
         self.authors_tag, self.authors_attrs = 'li', {'class': 'contributor item'}
         self.cashed_data = []
+
 
 class Libs(Site):
     def __init__(self, url):
@@ -82,9 +88,9 @@ class Libs(Site):
         self.cashed_data = []
 
     def get_tags(self):
-        taged_titles, taged_authors = Site.get_tags(self)
-        taged_authors.insert(26, 'Error') # в книге под номером 26 не указан автор Мариам Петросян, но никого это не волнует
-
+        taged_authors, taged_titles = Site.get_tags(self)
+        # В книге под номером 26 не указан автор Мариам Петросян, но никого это не волнует
+        taged_authors.insert(26, 'Error')
         return taged_authors, taged_titles
 
 
@@ -97,7 +103,7 @@ class Readly(Site):
         self.cashed_data = []
 
     def get_tags(self):
-        #Переопределяем функцию, ибо авторы перечислены в тегах, а не лежат в отдельном объекте
+        # Переопределяем функцию, ибо авторы перечислены в тегах, а не лежат в отдельном объекте
         book_infos, taged_titles = Site.get_tags(self)
         taged_authors = []
 
@@ -110,14 +116,13 @@ class Readly(Site):
 
         return taged_authors, taged_titles
 
-#Ниже - спорное решение, оптимизируйте =)
+# Ниже - спорное решение, оптимизируйте =)
 
 LL = 'http://www.livelib.ru/books/top'
 RR = 'http://readrate.com/rus/ratings/top100'
 L = 'http://libs.ru/best-100'
 R = 'http://readly.ru/books/top'
 urls = [LL, RR, L, R]
-cashed_data = {}
 
 livelib = LiveLib(LL)
 readrate = ReadRate(RR)
@@ -129,4 +134,4 @@ sites = {'LiveLib': livelib,
          'Libs': libs,
          'Readly': readly
          }
-#readly.get_books_list() #для тестов удобно
+# libs.get_tags() #для тестов удобно

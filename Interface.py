@@ -1,17 +1,19 @@
-import os
+#import os
 import sys
 import requests
 import backend
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit,
-                             QApplication, QLabel, QTextEdit,
-                             QGridLayout, QListWidget, QComboBox,
-                             QMainWindow, QMessageBox, QDesktopWidget)
+                             QApplication, QGridLayout,
+                             QListWidget, QComboBox,
+                             QMessageBox, QDesktopWidget)
 from PyQt5.QtGui import QIcon
+
 # Wtf??! мой Qt не робит без переменной окружения,
 # установленной непосредственно в словарь пайтона, это странно
 # пробуйте закомментить эти строки на своих платформах
-path = r'C:\Users\Тимур\AppData\Local\Programs\Python\Python35-32\Lib\site-packages\PyQt5\Qt\plugins\platforms'
-os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = path
+# path = r'C:\Users\Тимур\AppData\Local\Programs\Python\Python35-32\Lib\site-packages\PyQt5\Qt\plugins\platforms'
+# os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = path
+# починил, не знаю как, само заработало
 
 
 class Window(QWidget):
@@ -55,7 +57,7 @@ class Window(QWidget):
 
         self.boxinp.hide()
 
-        self.resize( 600, 600)
+        self.resize(600, 600)
         self.center(self)
         self.setWindowTitle('My big fully-functional parser')
         self.setWindowIcon(QIcon('www.png'))
@@ -81,9 +83,6 @@ class Window(QWidget):
         else:
             self.setTopByBox()
 
-    def msgbuttonClicked(self):                     #вот эту штуку нужно убрать, слот-метод же есть
-        self.prsbtn.setText('Исправил, проверяйте')
-
     def connection_try(self):
         try:
             data = backend.sites[self.sitename].get_books_list()
@@ -107,7 +106,7 @@ class Window(QWidget):
         else:
             self.msgbox.setText('Что такое?')
             self.msgbox.setInformativeText('Введите нормальный URL')
-            self.msgbtn.clicked.connect(self.msgbuttonClicked)
+            self.msgbtn.clicked.connect(lambda: self.prsbtn.setText('Исправил, проверяйте'))
             self.msgbox.show()
 
 if __name__ == '__main__':
