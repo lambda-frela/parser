@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 class Site():
     def __init__(self, url):
         self.url = url
-        self.name = re.findall('(\w+\.\w+)\/', url)[0]
+        self.name = re.findall('(\w+\.\w+)\/', self.url)[0]
 
     def parse(self):
         r = requests.get(self.url)
@@ -39,22 +39,20 @@ class Site():
             counter = range(len(taged_titles))
 
             for num, author, title in zip(counter, taged_authors, taged_titles):
+                title = title.get_text().strip()
                 try:
-                    title = title.get_text().strip()
                     author = author.get_text()
-                    string = '{0}. {1} \n "{2}"'.format(num + 1, author, title)
-                    books.append(string)
+                    string = '{0}. {1}\n    "{2}"'.format(num + 1, author, title)
                 except AttributeError:
                     # Исключения поднимутся в случаях, когда после парсинга некоторые элементы будут не типа "Tag"
                     # В этом случае предусмотрено поведение для типов str и list,
                     # которые появятся в списке тегов, если автора нет или их несколько
                     if isinstance(author, str):
-                        string = '{0}. {1} "{2}"'.format(num + 1, '-ошибка парсинга-', title)
+                        string = '{0}. {1}\n    "{2}"'.format(num + 1, '-ошибка парсинга-', title)
                     elif isinstance(author, list):
                         authors = ', '.join(map(lambda x: x.get_text(), author))  # Сложна?
-                        string = '{0}. {1} "{2}"'.format(num + 1, authors, title)
-
-                    books.append(string)
+                        string = '{0}. {1}\n     "{2}"'.format(num + 1, authors, title)
+                books.append(string)
             # в классы сайтов добавил аттрибут для кэша данных
             self.cashed_data = books
 
@@ -62,7 +60,7 @@ class Site():
 
 
 class LiveLib(Site):
-    def __init__(self, url):
+    def __init__(self, url='http://www.livelib.ru/books/top'):
         Site.__init__(self, url)
         self.container_tag, self.container_attrs = 'table', {'class': "linear-list"}
         self.title_tag, self.title_attrs = 'a', {'class': "tag-book-title"}
@@ -71,7 +69,7 @@ class LiveLib(Site):
 
 
 class ReadRate(Site):
-    def __init__(self, url):
+    def __init__(self, url='http://readrate.com/rus/ratings/top100'):
         Site.__init__(self, url)
         self.container_tag, self.container_attrs = 'div', {'class': "books-list"}
         self.title_tag, self.title_attrs = 'div', {'class': "title"}
@@ -80,7 +78,7 @@ class ReadRate(Site):
 
 
 class Libs(Site):
-    def __init__(self, url):
+    def __init__(self, url='http://libs.ru/best-100'):
         Site.__init__(self, url)
         self.container_tag, self.container_attrs = 'div', {'class': "posts doocode_book_result_filter"}
         self.title_tag, self.title_attrs = 'h2', {}
@@ -95,7 +93,7 @@ class Libs(Site):
 
 
 class Readly(Site):
-    def __init__(self, url):
+    def __init__(self, url='http://readly.ru/books/top'):
         Site.__init__(self, url)
         self.container_tag, self.container_attrs = 'div', {'class': 'book-list-view'}
         self.title_tag, self.title_attrs = 'h3', {'class': 'blvi__title'}
@@ -116,22 +114,17 @@ class Readly(Site):
 
         return taged_authors, taged_titles
 
-# Ниже - спорное решение, оптимизируйте =)
 
-LL = 'http://www.livelib.ru/books/top'
-RR = 'http://readrate.com/rus/ratings/top100'
-L = 'http://libs.ru/best-100'
-R = 'http://readly.ru/books/top'
-urls = [LL, RR, L, R]
+urls = {'http://www.livelib.ru/books/top': LiveLib(),
+        'http://readrate.com/rus/ratings/top100': ReadRate(),
+        'http://libs.ru/best-100': Libs(),
+        'http://readly.ru/books/top': Readly()
+        }
 
-livelib = LiveLib(LL)
-readrate = ReadRate(RR)
-libs = Libs(L)
-readly = Readly(R)
-
-sites = {'LiveLib': livelib,
-         'ReadRate': readrate,
-         'Libs': libs,
-         'Readly': readly
+sites = {'LiveLib': LiveLib(),
+         'ReadRate': ReadRate(),
+         'Libs': Libs(),
+         'Readly': Readly()
          }
+
 # libs.get_tags() #для тестов удобно

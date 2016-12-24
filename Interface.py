@@ -1,4 +1,4 @@
-#import os
+# import os
 import sys
 import requests
 import backend
@@ -8,12 +8,10 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit,
                              QMessageBox, QDesktopWidget)
 from PyQt5.QtGui import QIcon
 
-# Wtf??! мой Qt не робит без переменной окружения,
-# установленной непосредственно в словарь пайтона, это странно
-# пробуйте закомментить эти строки на своих платформах
-# path = r'C:\Users\Тимур\AppData\Local\Programs\Python\Python35-32\Lib\site-packages\PyQt5\Qt\plugins\platforms'
+# Если при запуске вылетает с ошибкой про отсутствие dll Qt,
+# хотя он установлен, попробуйте следующие строки раскомментить
+# path = r'C:\%your\path\to\python%\Python\Python35-32\Lib\site-packages\PyQt5\Qt\plugins\platforms'
 # os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = path
-# починил, не знаю как, само заработало
 
 
 class Window(QWidget):
@@ -23,7 +21,6 @@ class Window(QWidget):
         self.initUI()
 
     def initUI(self):
-
         self.lineinp = QLineEdit(self)
         self.lineinp.setPlaceholderText("Enter the site's URL here")
 
@@ -78,14 +75,15 @@ class Window(QWidget):
             self.lineinp.hide()
 
     def prsbuttonClicked(self):
+        self.datalist.clear()
         if self.lineinp.isVisible():
             self.setTopByLine()
         else:
             self.setTopByBox()
 
-    def connection_try(self):
+    def connection_try(self, currentsite):
         try:
-            data = backend.sites[self.sitename].get_books_list()
+            data = currentsite.get_books_list()
         except requests.exceptions.ConnectionError:
             self.msgbox.setText('Ошибка сети')
             self.msgbox.setInformativeText('Проверьте подключение к интернету')
@@ -94,15 +92,19 @@ class Window(QWidget):
             self.datalist.addItems(data)
 
     def setTopByBox(self):
-        self.datalist.clear()
-        self.sitename = self.boxinp.currentText()
-        self.connection_try()
+        sitename = self.boxinp.currentText()
+        currentsite = backend.sites[sitename]
+        self.connection_try(currentsite)
+
+    # На самом деле очевидно, что данный парсер с его архитектурой
+    # весьма глупо реализовывать через ввод URL
+    # данная возможность предусмотренна исключетельно ради примера использования QLineEdit
 
     def setTopByLine(self):
-        self.datalist.clear()
-        sitename = self.datalist.clear()
-        if sitename in backend.urls:
-            self.connection_try()
+        siteurl = self.lineinp.text()
+        if siteurl in backend.urls:
+            currentsite = backend.urls[siteurl]
+            self.connection_try(currentsite)
         else:
             self.msgbox.setText('Что такое?')
             self.msgbox.setInformativeText('Введите нормальный URL')
