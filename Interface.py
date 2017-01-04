@@ -8,14 +8,16 @@ from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit,
                              QMessageBox, QDesktopWidget)
 from PyQt5.QtGui import QIcon
 
+
 # Если при запуске вылетает с ошибкой про отсутствие dll Qt,
 # хотя он установлен, попробуйте следующие строки раскомментить
 # path = r'C:\%your\path\to\python%\Python\Python35-32\Lib\site-packages\PyQt5\Qt\plugins\platforms'
 # os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = path
 
 
-class Window(QWidget):
+# Функционал легко расширить за счет кликов по полям с книгами
 
+class Window(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -110,8 +112,3 @@ class Window(QWidget):
             self.msgbox.setInformativeText('Введите нормальный URL')
             self.msgbtn.clicked.connect(lambda: self.prsbtn.setText('Исправил, проверяйте'))
             self.msgbox.show()
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = Window()
-    sys.exit(app.exec_())

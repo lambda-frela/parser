@@ -3,14 +3,16 @@ import re
 
 import requests
 
+from urllib.parse import urlparse
+
 from bs4 import BeautifulSoup
-# Функционал легко расширить за счет кликов по полям с книгами
 
 
 class Site():
     def __init__(self, url):
         self.url = url
-        self.name = re.findall('(\w+\.\w+)\/', self.url)[0]
+        self.name = urlparse(self.url).netloc
+        self.cashed_data = []
 
     def parse(self):
         r = requests.get(self.url)
@@ -65,7 +67,6 @@ class LiveLib(Site):
         self.container_tag, self.container_attrs = 'table', {'class': "linear-list"}
         self.title_tag, self.title_attrs = 'a', {'class': "tag-book-title"}
         self.authors_tag, self.authors_attrs = 'a', {'class': 'tag-book-author'}
-        self.cashed_data = []
 
 
 class ReadRate(Site):
@@ -74,7 +75,6 @@ class ReadRate(Site):
         self.container_tag, self.container_attrs = 'div', {'class': "books-list"}
         self.title_tag, self.title_attrs = 'div', {'class': "title"}
         self.authors_tag, self.authors_attrs = 'li', {'class': 'contributor item'}
-        self.cashed_data = []
 
 
 class Libs(Site):
@@ -83,7 +83,6 @@ class Libs(Site):
         self.container_tag, self.container_attrs = 'div', {'class': "posts doocode_book_result_filter"}
         self.title_tag, self.title_attrs = 'h2', {}
         self.authors_tag, self.authors_attrs = 'a', {'href': re.compile('/a/*')}
-        self.cashed_data = []
 
     def get_tags(self):
         taged_authors, taged_titles = Site.get_tags(self)
@@ -98,7 +97,6 @@ class Readly(Site):
         self.container_tag, self.container_attrs = 'div', {'class': 'book-list-view'}
         self.title_tag, self.title_attrs = 'h3', {'class': 'blvi__title'}
         self.authors_tag, self.authors_attrs = 'div', {'class': 'blvi__book_info'}
-        self.cashed_data = []
 
     def get_tags(self):
         # Переопределяем функцию, ибо авторы перечислены в тегах, а не лежат в отдельном объекте
