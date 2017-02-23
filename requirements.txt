@@ -1,0 +1,4 @@
+# Packages and libraries witch are needed #
+requests
+PyQt5
+BeautifulSoup4
