@@ -62,7 +62,7 @@ target/
 .ipynb_checkpoints
 
 # Ignore parser results
-*.txt
+# *.txt
 
 #Ignore Pycharm
 .idea/
